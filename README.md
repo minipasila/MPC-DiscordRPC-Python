@@ -1,105 +1,142 @@
-# MPC-DiscordRPC
-Discord Rich Presence for Media Player Classic (Home Cinema and Black Edition)
+# MPC-DiscordRPC (Python Edition)
+Discord Rich Presence for Media Player Classic (Home Cinema and Black Edition) with enhanced features
 
-![Media Player Classic Home Cinema and Black Edition Rich Presence on Discord small profile](https://i.imgur.com/QAAJZgL.png)
+![Media Player Classic Home Cinema and Black Edition Rich Presence on Discord](https://i.imgur.com/QAAJZgL.png)
+
+## ✨ Features
+
+- **Automatic IMDb Thumbnails**: Fetches movie/show posters from IMDb automatically
+- **Smart Thumbnail Caching**: Reduces API calls by caching thumbnails locally
+- **Manual Overrides**: Customize thumbnails and IMDb links for specific content
+- **Intelligent Filename Cleaning**: Advanced detection and removal of quality tags, release groups, and other clutter
+- **Episode Detection**: Properly handles TV series with season/episode formatting
+- **Real-time Status Updates**: Shows play/pause status and progress
 
 ## How does this work?
-This program simply fetches playback data from MPC-HC / MPC-BE Web Interface, and displays it in your Discord profile through their wonderful [Rich Presence](https://discordapp.com/rich-presence) API.
 
-Please note that this only works with [Discord desktop client](https://discordapp.com/download), not with the web app.
+This Python program fetches playback data from MPC-HC/MPC-BE's Web Interface and displays it in your Discord profile through Discord's Rich Presence API. It automatically searches IMDb for thumbnails and intelligently cleans filenames for better presentation.
 
-## How to install
-1. Open your Media Player Classic, go to `View > Options > Player > Web Interface` and enable `Listen on port:` option. The default port is `13579`, but if you have changed it, please edit the `config.js` file after you download the project.
+**Note**: This only works with the [Discord desktop client](https://discordapp.com/download), not the web app.
+
+## Prerequisites
+
+1. **Discord Application Setup**:
+   - Go to [Discord Developer Portal](https://discord.com/developers/applications)
+   - Create a new application (the name will appear as "Playing [YourAppName]")
+   - Copy your **Client ID** from the OAuth2 section
+   - Optionally, upload custom icons in Rich Presence → Art Assets
+
+2. **Python Installation**:
+   - Install [Python 3.7+](https://www.python.org/downloads/)
+   - Make sure to check "Add Python to PATH" during installation
+
+## Installation
+
+### Step 1: Enable MPC Web Interface
+
+Open Media Player Classic, go to `View > Options > Player > Web Interface` and enable `Listen on port:`. The default port is `13579`.
 
 ![Enable the option "Listen on port"](https://cdn.discordapp.com/attachments/416273308540207116/428748994307424256/unknown.png)
 
-2. Install [`Node.JS`](https://nodejs.org/en/download/current/) (we recommend using the latest version).
+### Step 2: Download and Setup
 
-3. [Download this project as a .zip file](https://github.com/angeloanan/MPC-DiscordRPC/archive/master.zip), extract it and open a terminal window in the project directory. Otherwise, if you have [Git](https://git-scm.com/) installed, run:
+1. [Download this project as a .zip file](https://github.com/minipasila/MPC-DiscordRPC-Python/archive/main.zip) and extract it, or clone with Git:
 
-```sh
-git clone https://github.com/angeloanan/MPC-DiscordRPC.git && cd MPC-DiscordRPC
+```bash
+git clone https://github.com/minipasila/MPC-DiscordRPC-Python.git
+cd MPC-DiscordRPC-Python
 ```
 
-4. Install dependencies using: 
-```sh
-npm i
-``` 
+2. Install required Python packages:
 
-> Note: You can safely ignore all peer and optional dependencies warnings as they are not required for the program to work.
-
-5. Start the program using: 
-```sh
-npm start
-``` 
-or via
-
-```sh
-node index.js
-``` 
-
-> Note: Using `npm start` will start the program as a background process so you don't need to keep a terminal window open in order to keep the script running. Thus, you may close your terminal window after running this command.
-
-And voilà! It will now show in your Discord profile what you're watching/listening to on MPC.
-
-If you started the program using `npm start` and need MPC-DiscordRPC to stop showing your playback info, just run:
-
-```
-npm stop
+```bash
+pip install -r requirements.txt
 ```
 
-## How to update
+### Step 3: Configuration
 
-1. Navigate to the directory where did you cloned/downloaded this project and open a terminal window.
+1. Open `config.py` in a text editor
+2. Replace `CLIENT_ID = '1398017215390814339'` with your Discord application's Client ID
+3. Adjust other settings as needed (see [Configuration Options](#configuration-options) below)
 
-2. Stop the program using:
+### Step 4: Run the Program
 
-```sh
-npm stop
+```bash
+python main.py
 ```
 
-3. Update this project by [redownloading this project as a .zip file](https://github.com/angeloanan/MPC-DiscordRPC/archive/master.zip) and replacing the old files. 
+The program will start monitoring MPC and updating your Discord status automatically. Keep the terminal window open while using.
 
-   Otherwise, if you have Git installed, run:
-   ```sh
-   git pull
-   ```
+## Configuration Options
 
-4. Start the program again using:
-```sh
-npm start
+Edit `config.py` to customize behavior:
+
+### Discord Settings
+- **`CLIENT_ID`**: Your Discord application's Client ID (required)
+- **`LARGE_IMAGE_KEY`**: Fallback icon when IMDb thumbnails aren't available
+- **`SMALL_IMAGE_KEY_PLAYING/PAUSED`**: Icons for play/pause status
+- **`LARGE_IMAGE_TOOLTIP`**: Hover text for the main image
+
+### MPC Settings
+- **`MPC_PORT`**: Port for MPC Web Interface (default: 13579)
+
+### Display Settings
+- **`CLEAN_FILENAMES_ADVANCED`**: Intelligently removes quality tags like "1080p", "BluRay", etc.
+- **`IGNORE_BRACKETS`**: Removes content in square brackets `[like this]`
+- **`REPLACE_UNDERSCORES`**: Converts underscores to spaces
+- **`REPLACE_DOTS`**: Converts dots to spaces (less aggressive than advanced cleaning)
+
+## Advanced Features
+
+### Custom Thumbnails and Overrides
+
+The program creates an `overrides.json` file where you can specify custom thumbnails or IMDb pages:
+
+```json
+{
+    "Your Favorite Show": "https://www.imdb.com/title/tt1234567/",
+    "Some Movie": "https://i.imgur.com/custom_image.jpg"
+}
 ```
 
-Now you may close the terminal. The project is fully up to date!
+- **IMDb URLs**: Program will scrape the poster from the IMDb page
+- **Direct Image URLs**: Must end with `.jpg`, `.jpeg`, `.png`, or `.webp`
 
-## `config.js` options
+### Thumbnail Caching
 
-#### `exports.port`
-Default: `13579`
+The program automatically caches IMDb thumbnails in `thumbnail_cache.json` to reduce repeated searches and improve performance. The cache persists between restarts.
 
-Port on which MPC Web Interface is running. See the [How to install](#how-to-install) section above to learn more.
+## Updating
 
-#### `exports.ignoreBrackets`
-Default: `true`
+1. Stop the program (Ctrl+C in terminal)
+2. Download the latest version or run `git pull` if using Git
+3. Install any new dependencies: `pip install -r requirements.txt`
+4. Restart with `python main.py`
 
-Whether to omit brackets `[]` and its content in filenames. Useful if you don't want to show on your profile those info tags that usually comes inside brackets in filenames, like `[1080p]`, `[Translator Group Name]`, etc. You can set it to `false` or remove this line to turn off this behavior.
+## Troubleshooting
 
-#### `exports.ignoreFiletype`
-Default: `false`
+### Common Issues
 
-Whether to omit filetype. Useful if you don't want to show on your profile the type of the file that is currently open, for example `.mp4`, `.mkv`, `.flac`. You can set it to `true` to turn on this behavior.
+**"Could not connect to Discord"**
+- Make sure Discord desktop app is running
+- Check that your `CLIENT_ID` is correct
+- Try restarting Discord
 
-#### `exports.replaceUnderscore`
-Default: `true`
+**"Could not parse MPC-HC data"**
+- Ensure MPC Web Interface is enabled on the correct port
+- Make sure a media file is fully loaded (not just opened)
+- Check that `MPC_PORT` in config.py matches your MPC settings
 
-Whether to replace `_` with space. Useful if you have files like `Your_Favourite_Movie`. You can set it to `false` or remove this line to turn off this behavior.
+**No thumbnails appearing**
+- Check your internet connection
+- IMDb may be temporarily blocking requests - thumbnails will resume automatically
+- You can add manual overrides in `overrides.json`
 
-#### `exports.replaceDots`
-Default: `true`
+### Logs and Debugging
 
-Whether to replace dot (`.`) characters (except the file extension one) with spaces. This way, `Your.Favourite.Movie.mp4` will be displayed as `Your Favourite Movie.mp4`. You can set it to `false` or remove this line to turn off this behavior.
+The program outputs detailed logs to help diagnose issues. Look for error messages in the terminal output.
 
-#### `exports.showRemainingTime`
-Default: `false`
+## Files Created
 
-Whether to display the current file's remaining playback time while playing, instead of showing the elapsed time.
+- `overrides.json`: Manual thumbnail and IMDb overrides
+- `thumbnail_cache.json`: Cached IMDb thumbnails for faster loading
